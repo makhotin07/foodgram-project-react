@@ -1,10 +1,32 @@
-version: '3.3'
+version: '3.8'
 services:
 
+  db:
+     image: postgres:12.0-alpine
+     volumes:
+       - pg-db:/var/lib/postgresql/data
+     env_file:
+      - ./.env
+
+  backend:
+    image: makhotin07/foodgram:v1
+    restart: always
+    command: >
+      /bin/bash -c "python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py load_ingredients ingredients.csv &&
+        python manage.py collectstatic --noinput &&
+        python manage.py loaddata data.json &&
+        gunicorn --bind 0:8000 foodgram.wsgi"
+    volumes:
+      - static_value:/app/static_backend/
+      - media_value:/app/media/
+    depends_on:
+      - db
+    env_file:
+      - ./.env
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: makhotin07/frontend:v1
     volumes:
       - ../frontend/:/app/result_build/
   nginx:
@@ -15,3 +37,13 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
+      - static_value:/var/html/static_backend/
+      - media_value:/var/html/media/
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  static_value:
+  media_value:
+  pg-db:
