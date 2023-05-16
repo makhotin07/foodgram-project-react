@@ -27,7 +27,7 @@ services:
     env_file:
       - ./.env
   frontend:
-    image: makhotin07/frontend
+    image: makhotin07/frontend:v1
     volumes:
       - ../frontend/:/app/result_build/
   nginx:
