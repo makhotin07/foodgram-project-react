@@ -9,7 +9,11 @@ services:
       - ./.env
 
   backend:
+<<<<<<< HEAD
     image: makhotin07/foodgram
+=======
+    image: makhotin07/foodgram:latest
+>>>>>>> 8f4ea1e (add example.env)
     container_name: backend
     restart: always
     command: >
