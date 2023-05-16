@@ -2,18 +2,14 @@ version: '3.8'
 services:
 
   db:
-     image: postgres:12.0-alpine
-     volumes:
-       - pg-db:/var/lib/postgresql/data
-     env_file:
+    image: postgres:12.0-alpine
+    volumes:
+      - pg-db:/var/lib/postgresql/data
+    env_file:
       - ./.env
 
   backend:
-<<<<<<< HEAD
-    image: makhotin07/foodgram
-=======
     image: makhotin07/foodgram:latest
->>>>>>> 8f4ea1e (add example.env)
     container_name: backend
     restart: always
     command: >
