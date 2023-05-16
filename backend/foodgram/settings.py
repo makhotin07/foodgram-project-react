@@ -28,7 +28,6 @@ DEBUG = int(os.getenv('DEBUG', 1))
 ALLOWED_HOSTS = ['*']
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
