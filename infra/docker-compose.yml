@@ -9,7 +9,8 @@ services:
       - ./.env
 
   backend:
-    image: makhotin07/foodgram:v1
+    image: makhotin07/foodgram
+    container_name: backend
     restart: always
     command: >
       /bin/bash -c "python manage.py makemigrations &&
@@ -26,7 +27,7 @@ services:
     env_file:
       - ./.env
   frontend:
-    image: makhotin07/frontend:v1
+    image: makhotin07/frontend
     volumes:
       - ../frontend/:/app/result_build/
   nginx:
