@@ -6,6 +6,7 @@ from .models import Recipe
 class IngredientForRecipeInLine(admin.TabularInline):
     model = Recipe.ingredients.through
     extra = 1
+    min_num = 1
 
 
 class RecipeAdmin(admin.ModelAdmin):
