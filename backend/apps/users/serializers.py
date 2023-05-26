@@ -1,9 +1,11 @@
 from apps.recipes.models import Recipe
 from django.core.paginator import Paginator
-from djoser.serializers import UserCreateSerializer, UserSerializer
+from djoser.serializers import UserCreateSerializer
+from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from .models import Follow, User
+from .models import Follow
+from .models import User
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

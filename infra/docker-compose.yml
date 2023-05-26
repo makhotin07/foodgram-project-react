@@ -9,7 +9,7 @@ services:
       - ./.env
 
   backend:
-    image: makhotin07/foodgram_backend:v1
+    image: annasimanova/foodgram_backend:latest
     restart: always
     command:
       - /bin/bash
@@ -32,7 +32,7 @@ services:
     env_file:
       - ./.env
   frontend:
-    image: makhotin07/foodgram_frontend:v1
+    image: annasimanova/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
   nginx:

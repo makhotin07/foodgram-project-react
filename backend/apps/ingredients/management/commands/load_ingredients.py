@@ -1,10 +1,12 @@
 import csv
 import os
 
-from apps.ingredients.models import Ingredient
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 from django.db.utils import IntegrityError
+
+from apps.ingredients.models import Ingredient
 
 DATA_ROOT = os.path.join(settings.BASE_DIR, 'data')
 
@@ -21,14 +23,14 @@ class Command(BaseCommand):
         # way = os.path.join(DATA_ROOT, options['filename'])
         try:
             with open(
-                os.path.join(
-                    DATA_ROOT, options['filename']), 'r', encoding='utf-8'
+                    os.path.join(
+                        DATA_ROOT, options['filename']), 'r', encoding='utf-8'
             ) as csv_file:
                 data = csv.reader(csv_file)
                 for row in data:
                     try:
                         name, unit = row
-                        Ingredient.objects.create(
+                        Ingredient.objects.bulk_create(
                             name=name,
                             measurement_unit=unit,
                         )

@@ -109,6 +109,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+/
 
 # Spyder project settings
 .spyderproject
@@ -130,3 +131,18 @@ dmypy.json
 
 # .idea
 .idea
+
+# npm
+node_modules/
+frontend/node_modules/
+
+# media & static
+media/
+backend/media/
+# static_backend/
+# backend/static_backend/
+media_value/
+static_value/
+
+# vscode local
+.vscode/

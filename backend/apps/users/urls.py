@@ -1,6 +1,8 @@
-from django.urls import include, path
+from django.urls import include
+from django.urls import path
 
-from .views import FollowApiView, FollowListViewSet
+from .views import FollowApiView
+from .views import FollowListViewSet
 
 urlpatterns = [
     path(
