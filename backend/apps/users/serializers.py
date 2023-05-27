@@ -67,7 +67,7 @@ class ListFollowSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Follow.objects.filter(user=user, following=obj.id).exists()
+        return Follow.following.filter(user=user, following=obj.id).exists()
 
     def get_recipes(self, obj):
         page_size = 3
@@ -81,3 +81,12 @@ class ListFollowSerializer(serializers.ModelSerializer):
         return Recipe.objects.filter(
             author=obj.following
         ).exclude(name__exact='').count()
+
+    def validate(self, attrs):
+        user = self.context.get('request').user
+        following = attrs.get('following')
+        if Follow.objects.filter(user=user, following=following).exists():
+            raise serializers.ValidationError("Нельзя подписаться на автора дважды")
+        if user == following:
+            raise serializers.ValidationError("Нельзя подписаться на самого себя")
+        return attrs

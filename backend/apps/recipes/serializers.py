@@ -4,7 +4,6 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-
 from .models import Favorite
 from .models import IngredientForRecipe
 from .models import Recipe
@@ -15,6 +14,8 @@ from apps.tags.serializers import TagSerializer
 from apps.users.serializers import CustomUserSerializer
 
 User = get_user_model()
+MIN_VALUE = 1
+MAX_VALUE = 32000
 
 
 class IngredientForRecipeSerializer(serializers.ModelSerializer):
@@ -59,19 +60,20 @@ class RecipeListSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return Favorite.objects.filter(user=request.user, recipe=obj).exists()
+        return Favorite.objects.filter(user=request.user,
+                                       fav_recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
         return ShoppingCart.objects.filter(
-            user=request.user, recipe=obj).exists()
+            user=request.user, recipe=obj, cart_recipe=obj).exists()
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    amount = serializers.IntegerField(min_value=1)
+    amount = serializers.IntegerField(min_value=MIN_VALUE, max_value=MAX_VALUE)
 
     class Meta:
         model = IngredientForRecipe
@@ -104,8 +106,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         recipe = validated_data['recipe']
-        if Favorite.objects.filter(user=user, recipe=recipe).exists():
-            raise serializers.ValidationError('Такой рецепт уже есть в избранном')
+        if Favorite.objects.filter(user=user, fav_recipe=recipe).exists():
+            raise serializers.ValidationError(
+                'Такой рецепт уже есть в избранном')
         favorite = Favorite.objects.create(user=user, recipe=recipe)
         return favorite
 
@@ -178,6 +181,6 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     def validate(self, data):
         user = data['user']
         recipe = data['recipe']
-        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+        if ShoppingCart.objects.filter(user=user, cart_recipe=recipe).exists():
             raise serializers.ValidationError('Такой рецепт уже есть в списке')
         return data

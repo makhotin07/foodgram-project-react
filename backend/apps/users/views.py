@@ -15,11 +15,6 @@ class FollowApiView(APIView):
     def post(self, request, pk):
         user = request.user
         following = get_object_or_404(User, id=pk)
-        if user == following:
-            return Response(
-                {'error': 'Нельзя подписаться на самого себя'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         if Follow.objects.filter(user=user, following=following).exists():
             return Response(
                 {'error': 'Нельзя подписаться на автора дважды'},
