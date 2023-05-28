@@ -1,10 +1,12 @@
-from apps.recipes.pagination import CustomPagination
 from django.contrib.auth import get_user_model
-from rest_framework import permissions, status
-from rest_framework.generics import ListAPIView, get_object_or_404
+from rest_framework import permissions
+from rest_framework import status
+from rest_framework.generics import ListAPIView
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.recipes.pagination import CustomPagination
 from .models import Follow
 from .serializers import ListFollowSerializer
 
@@ -20,7 +22,7 @@ class FollowApiView(APIView):
                 {'error': 'Нельзя подписаться на автора дважды'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        create_follow = Follow.objects.create(user=user, following=following)
+        create_follow = user.following.create()
         serializer = ListFollowSerializer(
             create_follow, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -28,7 +30,7 @@ class FollowApiView(APIView):
     def delete(self, request, pk):
         user = request.user
         following = get_object_or_404(User, id=pk)
-        delete_follow = Follow.objects.filter(user=user, following=following)
+        delete_follow = user.following.all()
         if delete_follow.exists():
             delete_follow.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)

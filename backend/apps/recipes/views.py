@@ -42,12 +42,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=pk)
         user = request.user
         if request.method == 'POST':
-            serializer = ShoppingCartCreateSerializer(data={'user': user, 'recipe': recipe})
+            serializer = ShoppingCartCreateSerializer(
+                data={'user': user, 'recipe': recipe})
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == 'DELETE':
-            ShoppingCart.objects.filter(user=user, cart_recipe=recipe).delete()
+            user.cart_recipe.all.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 

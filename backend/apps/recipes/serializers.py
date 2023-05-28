@@ -53,15 +53,14 @@ class RecipeListSerializer(serializers.ModelSerializer):
         )
 
     def get_ingredients(self, obj):
-        queryset = IngredientForRecipe.objects.filter(recipe=obj)
+        queryset = obj.ingredientforrecipe_set.all()
         return IngredientForRecipeSerializer(queryset, many=True).data
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return Favorite.objects.filter(user=request.user,
-                                       fav_recipe=obj).exists()
+        return obj.fav_recipe.filter(user=request.user).exists()
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
@@ -106,7 +105,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         recipe = validated_data['recipe']
-        if Favorite.objects.filter(user=user, fav_recipe=recipe).exists():
+        if recipe.fav_recipe.filter(user=user).exists():
             raise serializers.ValidationError(
                 'Такой рецепт уже есть в избранном')
         favorite = Favorite.objects.create(user=user, recipe=recipe)
@@ -136,7 +135,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         self.fields['tags'] = TagSerializer(many=True)
         representation = super().to_representation(obj)
         representation['ingredients'] = IngredientForRecipeSerializer(
-            IngredientForRecipe.objects.filter(recipe=obj).all(), many=True
+            obj.ingredients.all(),
+            many=True
         ).data
         return representation
 
@@ -161,8 +161,8 @@ class ShoppingCartCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         user = data['user']
-        recipe = data['recipe']
-        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+        # recipe = data['recipe']
+        if user.cart_recipe.all.exists():
             raise serializers.ValidationError('Такой рецепт уже есть в списке')
         return data
 
