@@ -1,11 +1,9 @@
 from apps.recipes.models import Recipe
 from django.core.paginator import Paginator
-from djoser.serializers import UserCreateSerializer
-from djoser.serializers import UserSerializer
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
-from .models import Follow
-from .models import User
+from .models import Follow, User
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -67,7 +65,7 @@ class ListFollowSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return user.following.all().exists()
+        return Follow.objects.filter(user=user, following=obj.id).exists()
 
     def get_recipes(self, obj):
         page_size = 3
@@ -81,15 +79,3 @@ class ListFollowSerializer(serializers.ModelSerializer):
         return Recipe.objects.filter(
             author=obj.following
         ).exclude(name__exact='').count()
-
-    def validate(self, attrs):
-        user = self.context.get('request').user
-        following = attrs.get('following')
-        if not user.is_anonymous and user.following.filter(
-                following=following).exists():
-            raise serializers.ValidationError(
-                "Нельзя подписаться на автора дважды")
-        if user == following:
-            raise serializers.ValidationError(
-                "Нельзя подписаться на самого себя")
-        return attrs

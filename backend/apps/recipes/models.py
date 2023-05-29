@@ -1,14 +1,10 @@
-from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
-
 from apps.ingredients.models import Ingredient
 from apps.tags.models import Tag
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
+from django.db import models
 
 User = get_user_model()
-
-MIN_VALUE = 1
-MAX_VALUE = 32000
 
 
 class Recipe(models.Model):
@@ -20,19 +16,18 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
-        verbose_name='Теги', )
+        verbose_name='Теги',)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='recipe',
-        verbose_name='Автор', )
+        verbose_name='Автор',)
     name = models.CharField(max_length=200, verbose_name='Title')
     image = models.ImageField(
         upload_to='recipes/', verbose_name='Картинка')
     text = models.TextField(verbose_name='Описание')
     cooking_time = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(MIN_VALUE),
-                    MaxValueValidator(MAX_VALUE)],
+        validators=[MinValueValidator(1)],
         verbose_name='Время приготовления'
     )
 
@@ -53,8 +48,7 @@ class IngredientForRecipe(models.Model):
         verbose_name='Ингредиент'
     )
     amount = models.PositiveIntegerField(
-        validators=[MinValueValidator(MIN_VALUE),
-                    MaxValueValidator(MAX_VALUE)],
+        validators=[MinValueValidator(1)],
         verbose_name='Количество'
     )
 

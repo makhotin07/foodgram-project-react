@@ -2,21 +2,17 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .filters import CustomRecipeFilter
-from .models import IngredientForRecipe
-from .models import Recipe
-from .models import ShoppingCart
+from .models import Favorite, IngredientForRecipe, Recipe, ShoppingCart
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrAdminOrReadOnly
-from .serializers import RecipeCreateSerializer
-from .serializers import RecipeListSerializer
-from .serializers import ShoppingCartCreateSerializer
+from .serializers import (FavoriteSerializer, RecipeCreateSerializer,
+                          RecipeListSerializer, ShoppingCartSerializer)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -42,14 +38,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=pk)
         user = request.user
         if request.method == 'POST':
-            serializer = ShoppingCartCreateSerializer(
-                data={'user': user, 'recipe': recipe})
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+                return Response(
+                    {'error': 'Такой рецепт уже есть в списке'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            shoping_cart = ShoppingCart.objects.create(user=user,
+                                                       recipe=recipe)
+            serializer = ShoppingCartSerializer(
+                shoping_cart, context={'request': request}
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        elif request.method == 'DELETE':
-            user.cart_recipe.all.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        if request.method == 'DELETE':
+            delete_shoping_cart = ShoppingCart.objects.filter(
+                user=user, recipe=recipe)
+            if delete_shoping_cart.exists():
+                delete_shoping_cart.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(
@@ -81,3 +87,31 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 "Content-Disposition": 'attachment; filename="shop_list.txt"',
             },
         )
+
+    @action(
+        detail=True,
+        methods=['POST', 'DELETE'],
+        url_path='favorite',
+        permission_classes=[IsAuthenticated],
+    )
+    def favorite(self, request, pk=None):
+        recipe = get_object_or_404(Recipe, id=pk)
+        user = request.user
+        if request.method == 'POST':
+            if Favorite.objects.filter(user=user, recipe=recipe).exists():
+                return Response(
+                    {'error': 'Такой рецепт уже есть в избанном'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            favorite = Favorite.objects.create(user=user, recipe=recipe)
+            serializer = FavoriteSerializer(
+                favorite, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        if request.method == 'DELETE':
+            favorite = Favorite.objects.filter(user=user, recipe=recipe)
+            if favorite.exists():
+                favorite.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
