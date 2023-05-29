@@ -161,7 +161,6 @@ class ShoppingCartCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         user = data['user']
-        # recipe = data['recipe']
         if user.cart_recipe.all.exists():
             raise serializers.ValidationError('Такой рецепт уже есть в списке')
         return data

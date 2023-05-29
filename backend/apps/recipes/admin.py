@@ -13,7 +13,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'author')
     list_display_links = ('name',)
     list_filter = ('name', 'author', 'tags')
-    inlines = (IngredientForRecipeInLine, )
+    inlines = (IngredientForRecipeInLine,)
     readonly_fields = ('is_favorited',)
 
     @admin.display(description='В избранном')
