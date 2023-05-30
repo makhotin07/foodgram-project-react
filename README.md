@@ -5,7 +5,7 @@
 ### Технологи
 Python 3.8.9, Django 4.0.3, Gunicorn, PostgreSQL
 
-![workflow badge](https://github.com/ani-zia/foodgram-project-react/actions/workflows/main.yml/badge.svg)
+![workflow badge](https://github.com/makhotin07/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
 Сайт в облаке: http://158.160.100.123/
 Вход для админа:
