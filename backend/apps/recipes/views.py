@@ -38,11 +38,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=pk)
         user = request.user
         if request.method == 'POST':
-            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
-                return Response(
-                    {'error': 'Такой рецепт уже есть в списке'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
             shoping_cart = ShoppingCart.objects.create(user=user,
                                                        recipe=recipe)
             serializer = ShoppingCartSerializer(

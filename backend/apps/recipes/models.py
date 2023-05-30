@@ -1,8 +1,9 @@
-from apps.ingredients.models import Ingredient
-from apps.tags.models import Tag
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
+
+from apps.ingredients.models import Ingredient
+from apps.tags.models import Tag
 
 User = get_user_model()
 
@@ -16,12 +17,12 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
-        verbose_name='Теги',)
+        verbose_name='Теги', )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='recipe',
-        verbose_name='Автор',)
+        verbose_name='Автор', )
     name = models.CharField(max_length=200, verbose_name='Title')
     image = models.ImageField(
         upload_to='recipes/', verbose_name='Картинка')

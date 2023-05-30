@@ -1,9 +1,11 @@
-from apps.recipes.models import Recipe
 from django.core.paginator import Paginator
-from djoser.serializers import UserCreateSerializer, UserSerializer
+from djoser.serializers import UserCreateSerializer
+from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from .models import Follow, User
+from .models import Follow
+from .models import User
+from apps.recipes.models import Recipe
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -28,7 +30,7 @@ class CustomUserSerializer(UserSerializer):
         request = self.context.get('request', )
         if not request or request.user.is_anonymous:
             return False
-        return Follow.objects.filter(user=request.user,
+        return Follow.following.filter(user=request.user,
                                      following=obj).exists()
 
 
@@ -65,7 +67,7 @@ class ListFollowSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Follow.objects.filter(user=user, following=obj.id).exists()
+        return Follow.following.filter(user=user, following=obj.id).exists()
 
     def get_recipes(self, obj):
         page_size = 3
@@ -76,6 +78,6 @@ class ListFollowSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def get_recipes_count(self, obj):
-        return Recipe.objects.filter(
+        return Recipe.following.filter(
             author=obj.following
         ).exclude(name__exact='').count()
