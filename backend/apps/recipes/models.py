@@ -2,8 +2,8 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from apps.ingredients.models import Ingredient
-from apps.tags.models import Tag
+from ingredients.models import Ingredient
+from tags.models import Tag
 
 User = get_user_model()
 
@@ -13,7 +13,8 @@ class Recipe(models.Model):
         Ingredient,
         through='IngredientForRecipe',
         through_fields=('recipe', 'ingredient'),
-        verbose_name='Ингредиенты'
+        verbose_name='Ингредиенты',
+        related_name='recipes'
     )
     tags = models.ManyToManyField(
         Tag,
@@ -47,6 +48,7 @@ class IngredientForRecipe(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
         verbose_name='Ингредиент'
+
     )
     amount = models.PositiveIntegerField(
         validators=[MinValueValidator(1)],
@@ -66,11 +68,12 @@ class Favorite(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name='Пользователь')
+        verbose_name='Пользователь',
+        related_name='favorites')
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='fav_recipe',
+        related_name='in_favorites',
         verbose_name='Рецепт в избранном'
     )
 
@@ -92,13 +95,13 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='cart_recipe',
+        related_name='carts',
         verbose_name='Пользователь',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='cart_recipe',
+        related_name='in_carts',
         verbose_name='Рецепт',
     )
 

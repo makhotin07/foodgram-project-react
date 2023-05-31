@@ -15,16 +15,6 @@ class FollowApiView(APIView):
     def post(self, request, pk):
         user = request.user
         following = get_object_or_404(User, id=pk)
-        if user == following:
-            return Response(
-                {'error': 'Нельзя подписаться на самого себя'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if Follow.objects.filter(user=user, following=following).exists():
-            return Response(
-                {'error': 'Нельзя подписаться на автора дважды'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         create_follow = Follow.objects.create(user=user, following=following)
         serializer = ListFollowSerializer(
             create_follow, context={'request': request})
@@ -33,7 +23,8 @@ class FollowApiView(APIView):
     def delete(self, request, pk):
         user = request.user
         following = get_object_or_404(User, id=pk)
-        delete_follow = Follow.objects.filter(user=user, following=following)
+        delete_follow = following.subscriptions.filter(user=user,
+                                                       following=following)
         if delete_follow.exists():
             delete_follow.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -48,4 +39,4 @@ class FollowListViewSet(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Follow.objects.filter(user=user)
+        return user.subscribers.filter(user=user)

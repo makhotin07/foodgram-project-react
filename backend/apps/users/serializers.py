@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from .models import Follow
 from .models import User
-from apps.recipes.models import Recipe
+from recipes.models import Recipe
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -67,7 +67,7 @@ class ListFollowSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Follow.following.filter(user=user, following=obj.id).exists()
+        return user.subscriptions.filter(user=user, following=obj.id).exists()
 
     def get_recipes(self, obj):
         page_size = 3
@@ -77,7 +77,5 @@ class ListFollowSerializer(serializers.ModelSerializer):
         serializer = RecipeForFollowerSerializer(recipes_paginated, many=True)
         return serializer.data
 
-    def get_recipes_count(self, obj):
-        return Recipe.following.filter(
-            author=obj.following
-        ).exclude(name__exact='').count()
+    def get_recipes_count(self, obj: User):
+        return obj.recipes.count()
