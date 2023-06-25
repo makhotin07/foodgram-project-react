@@ -1,7 +1,7 @@
 # 🥗 Foodgram: «Продуктовый помощник» 🥗
 
 <div align="center">
-    <img src="https://image.flaticon.com/icons/png/512/2921/2921822.png" width="150" height="150"/>
+    <img src="https://img.icons8.com/color/452/cookbook.png" width="150" height="150"/>
 </div>
 
 <p align="center"><i>Ваш личный кулинарный ассистент в мире рецептов!</i></p>
@@ -70,14 +70,14 @@ docker-compose -f docker-compose.dev.yml up -d --build
 docker-compose exec backend python manage.py createsuperuser
 ```
 
-#### 6. Откройте в браузере:
+#### 6. Откр
+
+ойте в браузере:
 - Главная страница: [http://localhost/](http://localhost/)
 - Панель администратора: [http://localhost/admin](http://localhost/admin)
 - Документация API: [http://localhost/api/docs/](http://localhost/api/docs/)
 
 ---
-
-
 
 <div align="center">
     <b>🍽 Приятного аппетита с Foodgram! 🍽</b>
